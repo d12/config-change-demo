@@ -1,33 +1,57 @@
-import os
-import requests
+import os, requests
 
 token = os.environ["GITHUB_TOKEN"]
 repo = os.environ["REPO"]
 issue_number = os.environ["ISSUE_NUMBER"]
+api = f"https://api.github.com/repos/{repo}"
 
-api_base = f"https://api.github.com/repos/{repo}"
+r = requests.get(f"{api}/issues/{issue_number}", headers={"Authorization": f"token {token}"})
+labels = [l["name"] for l in r.json()["labels"]]
 
-# Get current labels
-labels_resp = requests.get(f"{api_base}/issues/{issue_number}", headers={"Authorization": f"token {token}"})
-labels = [lbl["name"] for lbl in labels_resp.json()["labels"]]
-
-# Logic for state progression
+# Determine transition
 if "status: inactive" in labels:
-    old, new = "status: inactive", "status: in staging"
+    prev, new = "status: inactive", "status: in staging"
 elif "status: in staging" in labels:
-    old, new = "status: in staging", "status: in production"
+    prev, new = "status: in staging", "status: in production"
 else:
-    old, new = None, None
+    prev = new = None
 
-if new:
-    if old:
-        requests.delete(f"{api_base}/issues/{issue_number}/labels/{old.replace(' ', '%20')}",
-                        headers={"Authorization": f"token {token}"})
-    requests.post(f"{api_base}/issues/{issue_number}/labels",
-                  headers={"Authorization": f"token {token}"}, json={"labels": [new]})
+if not new:
+    print("No valid environment progression found.")
+    exit(0)
 
-    # If now in production, close issue
-    if new == "status: in production":
-        requests.patch(f"{api_base}/issues/{issue_number}",
-                       headers={"Authorization": f"token {token}"},
-                       json={"state": "closed"})
+# Remove "approved for next environment" and old status
+for lbl in ["approved for next environment", prev]:
+    requests.delete(f"{api}/issues/{issue_number}/labels/{lbl.replace(' ', '%20')}",
+                    headers={"Authorization": f"token {token}"})
+
+# Add new status
+requests.post(f"{api}/issues/{issue_number}/labels",
+              headers={"Authorization": f"token {token}"},
+              json={"labels": [new]})
+
+# If deployed to staging → auto-request approval for production
+if new == "status: in staging":
+    print("Triggering next approval for production.")
+    approvers = [
+        l.strip()
+        for l in open(".configuration_change_automation/approvers")
+        if l.strip()
+    ]
+    body = "Deployment to **staging** complete.\n\nRequesting approval for **production**:\n" + "\n".join([f"- {a}" for a in approvers])
+    requests.post(f"{api}/issues/{issue_number}/comments",
+                  headers={"Authorization": f"token {token}"},
+                  json={"body": body})
+    # Add awaiting approval again
+    requests.post(f"{api}/issues/{issue_number}/labels",
+                  headers={"Authorization": f"token {token}"},
+                  json={"labels": ["awaiting approval"]})
+
+elif new == "status: in production":
+    # Close issue
+    requests.post(f"{api}/issues/{issue_number}/comments",
+                  headers={"Authorization": f"token {token}"},
+                  json={"body": "Deployment to **production** complete. Closing issue."})
+    requests.patch(f"{api}/issues/{issue_number}",
+                   headers={"Authorization": f"token {token}"},
+                   json={"state": "closed"})
