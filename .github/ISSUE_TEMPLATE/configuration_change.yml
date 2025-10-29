@@ -32,15 +32,3 @@ body:
       placeholder: 
     validations:
       required: false
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: Which environments?
-      description: What IBM Verify environments should this change be made in? Most changes should be performed in all environments
-      options:
-        - label: Test
-          required: false
-        - label: Staging
-          required: false
-        - label: Production
-          required: false
