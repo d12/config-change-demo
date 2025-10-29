@@ -1,0 +1,47 @@
+name: IBM Verify Configuration Change
+description: Request an IBM Verify Configuration Change
+title: ""
+labels: ["configuration-change", "status: inactive"]
+assignees:
+  - d12
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out this form to request a change in the IBM Verify tenants.
+  - type: input
+    id: rp
+    attributes:
+      label: Which RP is this change for?
+      description: Please leave this field blank if the change is not for a specific RP.
+      placeholder: ex. "Simple Relying Party Simulator" 
+    validations:
+      required: false
+  - type: textarea
+    id: change
+    attributes:
+      label: Describe your requested change
+      description: Please describe the change you'd like to make. Be specific.
+      placeholder: ex. Modify the Logout endpoint to be "..."
+    validations:
+      required: true
+  - type: input
+    id: change
+    attributes:
+      label: Associated issue, slack conversation, or other reference
+      description: If you have a URL with more context, please share it here.
+      placeholder: 
+    validations:
+      required: false
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Which environments?
+      description: What IBM Verify environments should this change be made in? Most changes should be performed in all environments
+      options:
+        - label: Test
+          required: false
+        - label: Staging
+          required: false
+        - label: Production
+          required: false
