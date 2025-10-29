@@ -1,6 +1,5 @@
 name: IBM Verify Configuration Change
 description: Request an IBM Verify Configuration Change
-title: ""
 labels: ["configuration-change", "status: inactive"]
 assignees:
   - d12
