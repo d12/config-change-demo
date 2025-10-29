@@ -1,7 +1,7 @@
 name: Configuration Change Opened
 on:
   issues:
-    types: [opened, labeled]
+    types: [opened]
 
 jobs:
   tag_approvers:
