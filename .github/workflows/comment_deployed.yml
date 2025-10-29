@@ -3,6 +3,10 @@ on:
   issue_comment:
     types: [created]
 
+permissions:
+  issues: write
+  contents: read
+
 jobs:
   mark_deployment:
     if: startsWith(github.event.comment.body, '!deployed')

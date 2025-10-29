@@ -13,4 +13,13 @@ with open(approvers_file) as f:
 body = "Requesting approval from:\n" + "\n".join([f"- {a}" for a in approvers])
 
 url = f"https://api.github.com/repos/{repo}/issues/{issue_number}/comments"
-requests.post(url, headers={"Authorization": f"token {token}"}, json={"body": body})
+response = requests.post(
+    url,
+    headers={"Authorization": f"token {token}"},
+    json={"body": body}
+)
+
+print("Response status:", response.status_code)
+print("Response text:", response.text)
+response.raise_for_status()
+
