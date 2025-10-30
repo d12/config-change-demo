@@ -5,6 +5,7 @@ repo = os.environ["REPO"]
 issue_number = os.environ["ISSUE_NUMBER"]
 commenter = os.environ.get("COMMENTER", "").lstrip("@")
 api = f"https://api.github.com/repos/{repo}"
+headers = {"Authorization": f"token {token}"}
 
 # --- Load approvers ---
 approvers_file = ".configuration_change_automation/approvers"
@@ -22,7 +23,7 @@ if commenter not in approvers:
     sys.exit(0)
 
 # Get labels to decide environment
-r = requests.get(f"{api}/issues/{issue_number}", headers={"Authorization": f"token {token}"})
+r = requests.get(f"{api}/issues/{issue_number}", headers=headers)
 labels = [l["name"] for l in r.json()["labels"]]
 
 if "status: inactive" in labels:
@@ -38,9 +39,9 @@ if not next_env:
 
 # Update labels
 requests.delete(f"{api}/issues/{issue_number}/labels/awaiting%20approval",
-                headers={"Authorization": f"token {token}"})
+                headers=headers)
 requests.post(f"{api}/issues/{issue_number}/labels",
-              headers={"Authorization": f"token {token}"},
+              headers=headers,
               json={"labels": ["approved for next environment"]})
 
 # Tag deployers
@@ -49,4 +50,4 @@ with open(".configuration_change_automation/deployers") as f:
 
 comment = f"Approved for deployment to **{next_env}**.\nTagging deployers:\n" + "\n".join([f"- {d}" for d in deployers])
 requests.post(f"{api}/issues/{issue_number}/comments",
-              headers={"Authorization": f"token {token}"}, json={"body": comment})
+              headers=headers, json={"body": comment})
