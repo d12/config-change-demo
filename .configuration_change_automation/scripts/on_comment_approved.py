@@ -3,7 +3,23 @@ import os, requests
 token = os.environ["GITHUB_TOKEN"]
 repo = os.environ["REPO"]
 issue_number = os.environ["ISSUE_NUMBER"]
+commenter = os.environ.get("COMMENTER", "").lstrip("@")
 api = f"https://api.github.com/repos/{repo}"
+
+# --- Load approvers ---
+approvers_file = ".configuration_change_automation/approvers"
+with open(approvers_file) as f:
+    approvers = [l.strip().lstrip("@") for l in f if l.strip()]
+
+print(f"Commenter: {commenter}")
+print(f"Allowed approvers: {approvers}")
+
+# --- Authorization check ---
+if commenter not in approvers:
+    msg = f"⚠️ @{commenter}, you are not authorized to approve configuration changes."
+    requests.post(f"{api}/issues/{issue_number}/comments", headers=headers, json={"body": msg})
+    print("User not authorized, exiting.")
+    sys.exit(0)
 
 # Get labels to decide environment
 r = requests.get(f"{api}/issues/{issue_number}", headers={"Authorization": f"token {token}"})
