@@ -27,7 +27,7 @@ if next_env == "staging":
 
         {approvers_string}
 
-        Required number of approvals: **{config["environments"]["prod"]["approvals"]}**
+        Required number of approvals: **{config["environments"]["prod"]["required_approvals"]}**
 
         Environment requested: **prod**
 
