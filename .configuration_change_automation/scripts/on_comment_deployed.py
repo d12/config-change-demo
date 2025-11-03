@@ -1,3 +1,4 @@
+import textwrap
 from utilities import get_next_env, remove_label, add_label, post_comment, get_configuration_yml
 
 next_env = get_next_env()
