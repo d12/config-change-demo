@@ -25,5 +25,28 @@ def post_github_comment(repo, issue_number, body):
 
     return r.json()
 
+def remove_label(repo, issue_number, label):
+    r = requests.delete(
+        f"{API}/repos/{repo}/issues/{issue_number}/labels/{label}",
+        headers=gh_auth_headers(),
+    )
+
+    # Raise error if request failed
+    r.raise_for_status()
+
+    return r.json()
+
+def add_label(repo, issue_number, label):
+    r = requests.post(
+        f"{API}/repos/{repo}/issues/{issue_number}/labels",
+        headers=gh_auth_headers(),
+        json={"labels": [label]},
+    )
+
+    # Raise error if request failed
+    r.raise_for_status()
+
+    return r.json()
+
 def gh_auth_headers():
     return {"Authorization": f"token {os.environ['GITHUB_TOKEN']}"}

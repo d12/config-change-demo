@@ -1,5 +1,5 @@
 import os, requests
-from utilities import get_next_env, get_configuration_yml, post_comment, get_number_of_approvals
+from utilities import get_next_env, get_configuration_yml, post_comment, get_number_of_approvals, remove_label, add_label
 
 commenter = os.environ.get("COMMENTER", "")
 comment_body = os.environ.get("COMMENT_BODY", "")
@@ -37,11 +37,8 @@ if current_approval_count < required_number_of_approvals:
 # We have enough approvals; update labels and tag deployers.
 
 # Update labels
-requests.delete(f"{api}/issues/{issue_number}/labels/awaiting%20approval",
-                headers=headers)
-requests.post(f"{api}/issues/{issue_number}/labels",
-              headers=headers,
-              json={"labels": ["approved for next environment"]})
+remove_label("awaiting approval")
+add_label("approved for next environment")
 
 # Tag deployers
 deployers_string = "\n".join([f"- {d}" for d in deployers])

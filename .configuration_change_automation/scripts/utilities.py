@@ -1,6 +1,5 @@
 import os, requests, yaml
-from github_client import get_github_issue, post_github_comment
-
+from github_client import get_github_issue, post_github_comment, remove_label, add_label
 
 def get_configuration_yml():
     config_path = ".configuration_change_automation/configuration_change_automation.yml"
@@ -49,3 +48,15 @@ def post_comment(body):
     token = os.environ["GITHUB_TOKEN"]
 
     return post_github_comment(repo, issue_number, body)
+
+def remove_label(label):
+    repo = os.environ["REPO"]
+    issue_number = os.environ["ISSUE_NUMBER"]
+
+    return remove_label(repo, issue_number, label)
+
+def add_label(label):
+    repo = os.environ["REPO"]
+    issue_number = os.environ["ISSUE_NUMBER"]
+
+    return add_label(repo, issue_number, label)
