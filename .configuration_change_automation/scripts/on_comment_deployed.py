@@ -1,5 +1,5 @@
 import textwrap
-from utilities import get_next_env, remove_label, add_label, post_comment, get_configuration_yml
+from utilities import get_next_env, remove_label, add_label, post_comment, get_configuration_yml, close_issue
 
 next_env = get_next_env()
 config = get_configuration_yml()
