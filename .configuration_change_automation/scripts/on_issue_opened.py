@@ -1,4 +1,3 @@
-import os, requests, yaml
 from utilities import get_next_env, post_comment, get_configuration_yml
 
 next_env = get_next_env()

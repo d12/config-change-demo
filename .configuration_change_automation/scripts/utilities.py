@@ -1,4 +1,4 @@
-import os, requests
+import os, requests, yaml
 from github_client import get_issue
 
 def get_configuration_yml():
