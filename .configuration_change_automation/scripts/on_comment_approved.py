@@ -1,4 +1,5 @@
 import os, requests
+from utilities import get_next_env
 
 token = os.environ["GITHUB_TOKEN"]
 repo = os.environ["REPO"]
@@ -7,13 +8,15 @@ commenter = os.environ.get("COMMENTER", "").lstrip("@")
 api = f"https://api.github.com/repos/{repo}"
 headers = {"Authorization": f"token {token}"}
 
-# --- Load approvers ---
-approvers_file = ".configuration_change_automation/approvers"
-with open(approvers_file) as f:
-    approvers = [l.strip().lstrip("@") for l in f if l.strip()]
+next_env = get_next_env(issue_number)
 
-print(f"Commenter: {commenter}")
-print(f"Allowed approvers: {approvers}")
+config_path = ".configuration_change_automation/configuration_change_automation.yml"
+with open(config_path) as f:
+    config_content = f.read()
+    config = yaml.safe_load(config_content)
+    # Get the {environment}.approvers key
+    approvers = config["environments"][next_env]["approvers"]
+    required_number_of_approvals = config["environments"][next_env]["required_approvals"]
 
 # --- Authorization check ---
 if commenter not in approvers:
