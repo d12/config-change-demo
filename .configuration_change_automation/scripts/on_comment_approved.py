@@ -1,44 +1,40 @@
 import os, requests
-from utilities import get_next_env
+from utilities import get_next_env, get_configuration_yml, post_comment, get_number_of_approvals
 
-token = os.environ["GITHUB_TOKEN"]
-repo = os.environ["REPO"]
-issue_number = os.environ["ISSUE_NUMBER"]
-commenter = os.environ.get("COMMENTER", "").lstrip("@")
-api = f"https://api.github.com/repos/{repo}"
-headers = {"Authorization": f"token {token}"}
+commenter = os.environ.get("COMMENTER", "")
+comment_body = os.environ.get("COMMENT_BODY", "")
 
-next_env = get_next_env(issue_number)
+config = get_configuration_yml()
+next_env = get_next_env()
 
-config_path = ".configuration_change_automation/configuration_change_automation.yml"
-with open(config_path) as f:
-    config_content = f.read()
-    config = yaml.safe_load(config_content)
-    # Get the {environment}.approvers key
-    approvers = config["environments"][next_env]["approvers"]
-    required_number_of_approvals = config["environments"][next_env]["required_approvals"]
+approvers = config["environments"][next_env]["approvers"]
+deployers = config["environments"][next_env]["deployers"]
+required_number_of_approvals = config["environments"][next_env]["required_approvals"]
 
 # --- Authorization check ---
 if commenter not in approvers:
     msg = f"⚠️ @{commenter}, you are not authorized to approve configuration changes."
-    requests.post(f"{api}/issues/{issue_number}/comments", headers=headers, json={"body": msg})
-    print("User not authorized, exiting.")
+    post_comment(msg)
     sys.exit(0)
 
-# Get labels to decide environment
-r = requests.get(f"{api}/issues/{issue_number}", headers=headers)
-labels = [l["name"] for l in r.json()["labels"]]
+# Ensure the approval matches the expected environment
+# Comment body should begin with "!approved <env>"
+expected_approval_command = f"!approved {next_env}"
+if not comment_body.startswith(expected_approval_command):
+    msg = (f"⚠️ @{commenter}, your approval is malformed or does not match the expected environment "
+              f"'{next_env}'. Please use the command: `{expected_approval_command}` to approve.")
+    post_comment(msg)
+    sys.exit(0)
 
-if "status: inactive" in labels:
-    next_env = "staging"
-elif "status: in staging" in labels:
-    next_env = "production"
-else:
-    next_env = None
+# Count approvals, see if we have enough to move forward.
+current_approval_count = get_number_of_approvals(next_env)
+if current_approval_count < required_number_of_approvals:
+    msg = (f"✅ @{commenter}, your approval has been recorded. "
+           f"We have {current_approval_count}/{required_number_of_approvals} approvals for deployment to **{next_env}**.")
+    post_comment(msg)
+    sys.exit(0)
 
-if not next_env:
-    print("No valid environment state found.")
-    exit(0)
+# We have enough approvals; update labels and tag deployers.
 
 # Update labels
 requests.delete(f"{api}/issues/{issue_number}/labels/awaiting%20approval",
@@ -48,9 +44,14 @@ requests.post(f"{api}/issues/{issue_number}/labels",
               json={"labels": ["approved for next environment"]})
 
 # Tag deployers
-with open(".configuration_change_automation/deployers") as f:
-    deployers = [l.strip() for l in f if l.strip()]
+deployers_string = "\n".join([f"- {d}" for d in deployers])
 
-comment = f"Approved for deployment to **{next_env}**.\nTagging deployers:\n" + "\n".join([f"- {d}" for d in deployers])
-requests.post(f"{api}/issues/{issue_number}/comments",
-              headers=headers, json={"body": comment})
+body = textwrap.dedent(f"""\
+    The required number of approvals has been met. Tagging deployers to apply change in IBM Verify:
+    {deployers_string}
+
+    Changes should be applied in: **{next_env}**
+
+    After the changes have been applied, deployers should comment: `!deployed {next_env}`
+    """)
+post_comment(body)

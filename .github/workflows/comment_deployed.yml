@@ -19,4 +19,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           REPO: ${{ github.repository }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
         run: python .configuration_change_automation/scripts/on_comment_deployed.py

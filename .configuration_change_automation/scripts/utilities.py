@@ -9,6 +9,26 @@ def get_configuration_yml():
         config = yaml.safe_load(config_content)
     return config
 
+# Count the number of comments that begin with the approval command `!approved <env>`
+def get_number_of_approvals(env):
+    repo = os.environ["REPO"]
+    issue_number = os.environ["ISSUE_NUMBER"]
+
+    issue = get_github_issue(repo, issue_number)
+    comments_url = issue["comments_url"]
+
+    r = requests.get(
+        comments_url,
+        headers={"Authorization": f"token {os.environ['GITHUB_TOKEN']}"}
+    )
+    r.raise_for_status()
+    comments = r.json()
+
+    approval_command = f"!approved {env}"
+    approval_count = sum(1 for comment in comments if comment["body"].startswith(approval_command))
+
+    return approval_count
+
 def get_next_env():
     issue = get_github_issue(os.environ["REPO"], os.environ["ISSUE_NUMBER"])
     labels = [l["name"] for l in issue["labels"]]
