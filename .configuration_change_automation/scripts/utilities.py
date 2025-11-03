@@ -59,4 +59,4 @@ def add_label(label):
     repo = os.environ["REPO"]
     issue_number = os.environ["ISSUE_NUMBER"]
 
-    return add_label(repo, issue_number, label)
+    return add_github_label(repo, issue_number, label)
