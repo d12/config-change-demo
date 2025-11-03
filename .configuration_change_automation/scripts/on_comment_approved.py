@@ -12,7 +12,7 @@ deployers = config["environments"][next_env]["deployers"]
 required_number_of_approvals = config["environments"][next_env]["required_approvals"]
 
 # --- Authorization check ---
-if commenter not in approvers:
+if f"@{commenter}" not in approvers:
     msg = f"⚠️ @{commenter}, you are not authorized to approve configuration changes."
     post_comment(msg)
     sys.exit(0)
