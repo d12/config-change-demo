@@ -1,3 +1,5 @@
+import os, requests
+
 API = "https://api.github.com"
 
 def get_issue(repo, issue_number):
