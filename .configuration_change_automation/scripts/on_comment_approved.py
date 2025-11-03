@@ -1,4 +1,4 @@
-import os, requests
+import os, requests, textwrap
 from utilities import get_next_env, get_configuration_yml, post_comment, get_number_of_approvals, remove_label, add_label
 
 commenter = os.environ.get("COMMENTER", "")
