@@ -5,7 +5,7 @@ config = get_configuration_yml()
 
 approvers = config["environments"][next_env]["approvers"]
 
-prev_label = f"status: in { 'staging' if next_env == 'prod' else 'inactive' }"
+prev_label = f"status: { 'in staging' if next_env == 'prod' else 'inactive' }"
 next_label = f"status: in { next_env }"
 
 # Remove "approved for next environment" and old status
@@ -32,7 +32,7 @@ if next_env == "staging":
 
         To approve, please comment: `!approved prod`. Or, close the issue to cancel deploying to production.
         """)
-        
+
     post_comment(body)
 
     # Add awaiting approval again
