@@ -1,4 +1,4 @@
-import os, requests
+import os, requests, yaml
 
 token = os.environ["GITHUB_TOKEN"]
 repo = os.environ["REPO"]
