@@ -1,5 +1,5 @@
 import os, requests, yaml
-from github_client import get_github_issue, post_github_comment, remove_label, add_label
+from github_client import get_github_issue, post_github_comment, remove_github_label, add_github_label
 
 def get_configuration_yml():
     config_path = ".configuration_change_automation/configuration_change_automation.yml"
@@ -53,7 +53,7 @@ def remove_label(label):
     repo = os.environ["REPO"]
     issue_number = os.environ["ISSUE_NUMBER"]
 
-    return remove_label(repo, issue_number, label)
+    return remove_github_label(repo, issue_number, label)
 
 def add_label(label):
     repo = os.environ["REPO"]
