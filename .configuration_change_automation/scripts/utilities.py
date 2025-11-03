@@ -1,5 +1,6 @@
 import os, requests, yaml
-from github_client import get_issue
+from github_client import get_github_issue, post_github_comment
+
 
 def get_configuration_yml():
     config_path = ".configuration_change_automation/configuration_change_automation.yml"
@@ -9,7 +10,7 @@ def get_configuration_yml():
     return config
 
 def get_next_env():
-    issue = get_issue(os.environ["REPO"], os.environ["ISSUE_NUMBER"])
+    issue = get_github_issue(os.environ["REPO"], os.environ["ISSUE_NUMBER"])
     labels = [l["name"] for l in issue["labels"]]
 
     if "status: inactive" in labels:
@@ -27,4 +28,4 @@ def post_comment(body):
     issue_number = os.environ["ISSUE_NUMBER"]
     token = os.environ["GITHUB_TOKEN"]
 
-    return post_comment(repo, issue_number, body)
+    return post_github_comment(repo, issue_number, body)
