@@ -2,13 +2,13 @@ environments:
   staging:
     required_approvals: 1
     deployers:
-      - d12
+      - "@d12"
     approvers:
-      - d12
+      - "@d12"
 
   prod:
     required_approvals: 2
     deployers:
-      - d12
+      - "@d12"
     approvers:
-      - d12
+      - "@d12"

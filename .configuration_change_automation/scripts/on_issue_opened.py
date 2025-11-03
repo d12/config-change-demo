@@ -12,7 +12,7 @@ labels = [l["name"] for l in r.json()["labels"]]
 if "status: inactive" in labels:
     next_env = "staging"
 elif "status: in staging" in labels:
-    next_env = "production"
+    next_env = "prod"
 else:
     next_env = None
 
@@ -20,11 +20,16 @@ if not next_env:
     print("No next environment detected; skipping.")
     exit(0)
 
-approvers_path = ".configuration_change_automation/approvers"
-with open(approvers_path) as f:
-    approvers = [l.strip() for l in f if l.strip()]
+config_path = ".configuration_change_automation/configuration_change_automation.yml"
+with open(config_path) as f:
+    config_content = f.read()
+    config = yaml.safe_load(config_content)
+    # Get the {environment}.approvers key
+    approvers = config["environments"][next_env]["approvers"]
+    required_number_of_approvals = config["environments"][next_env]["required_approvals"]
 
 body = f"Requesting approval from:\n" + "\n".join([f"- {a}" for a in approvers])
+body += f"\n\nRequired number of approvals: **{required_number_of_approvals}**"
 body += f"\n\nEnvironment requested: **{next_env}**"
 
 resp = requests.post(
