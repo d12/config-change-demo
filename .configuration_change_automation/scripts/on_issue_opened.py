@@ -28,10 +28,17 @@ with open(config_path) as f:
     approvers = config["environments"][next_env]["approvers"]
     required_number_of_approvals = config["environments"][next_env]["required_approvals"]
 
-body = f"Requesting approval from:\n" + "\n".join([f"- {a}" for a in approvers])
-body += f"\n\nRequired number of approvals: **{required_number_of_approvals}**"
-body += f"\n\nEnvironment requested: **{next_env}**"
+approvers_string = "\n".join([f"- {a}" for a in approvers])
+body = f"""\
+This change requires approvals from the following approvers:
+{approvers_string}
 
+Required number of approvals: **{required_number_of_approvals}**
+
+Environment requested: **{next_env}**
+
+To approve, please comment: `!approved {next_env}`
+"""
 resp = requests.post(
     f"{api}/issues/{issue_number}/comments",
     headers={"Authorization": f"token {token}"},
