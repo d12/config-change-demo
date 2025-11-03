@@ -1,3 +1,4 @@
+import textwrap
 from utilities import get_next_env, post_comment, get_configuration_yml
 
 next_env = get_next_env()
@@ -13,15 +14,15 @@ required_number_of_approvals = config["environments"][next_env]["required_approv
 
 approvers_string = "\n".join([f"- {a}" for a in approvers])
 
-body = f"""\
-This change requires approvals from the following approvers:
-{approvers_string}
+body = textwrap.dedent(f"""\
+    This change requires approvals from the following approvers:
+    {approvers_string}
 
-Required number of approvals: **{required_number_of_approvals}**
+    Required number of approvals: **{required_number_of_approvals}**
 
-Environment requested: **{next_env}**
+    Environment requested: **{next_env}**
 
-To approve, please comment: `!approved {next_env}`
-"""
+    To approve, please comment: `!approved {next_env}`
+    """)
 
 resp = post_comment(body)
