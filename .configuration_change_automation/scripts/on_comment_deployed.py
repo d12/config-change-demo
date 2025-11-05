@@ -23,17 +23,17 @@ def main():
         approvers_string = "\n".join([f"- {a}" for a in approvers]) 
         body = f"Deployment to **staging** complete.\n\nRequesting approval for **production**:\n{approvers_string}"
 
-        body = textwrap.dedent(f"""\
-            Deployment to **staging** has been recorded. This change now requires approvals from the following:
+        body = f"""\
+        Deployment to **staging** has been recorded. This change now requires approvals from the following:
 
-            {approvers_string}
+        {approvers_string}
 
-            Required number of approvals: **{config["environments"]["prod"]["required_approvals"]}**
+        Required number of approvals: **{config["environments"]["prod"]["required_approvals"]}**
 
-            Environment requested: **prod**
+        Environment requested: **prod**
 
-            To approve, please comment: `!approved prod`. Or, close the issue to cancel deploying to production.
-            """)
+        To approve, please comment: `!approved prod`. Or, close the issue to cancel deploying to production.
+        """
 
         post_comment(body)
 

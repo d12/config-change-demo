@@ -45,14 +45,15 @@ def main():
     # Tag deployers
     deployers_string = "\n".join([f"- {d}" for d in deployers])
 
-    body = textwrap.dedent(f"""\
-        The required number of approvals has been met. Tagging deployers to apply change in IBM Verify:
-        {deployers_string}
+    body = f"""\
+    The required number of approvals has been met. Tagging deployers to apply change in IBM Verify:
+    {deployers_string}
 
-        Changes should be applied in: **{next_env}**
+    Changes should be applied in: **{next_env}**
 
-        After the changes have been applied, deployers should comment: `!deployed {next_env}`
-        """)
+    After the changes have been applied, deployers should comment: `!deployed {next_env}`
+    """
+    
     post_comment(body)
 
 if __name__ == "__main__":
