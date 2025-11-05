@@ -17,15 +17,15 @@ def main():
     approvers_string = "\n".join([f"- {a}" for a in approvers])
 
     body = f"""\
-    This change requires approvals from the following approvers:
-    {approvers_string}
+This change requires approvals from the following approvers:
+{approvers_string}
 
-    Required number of approvals: **{required_number_of_approvals}**
+Required number of approvals: **{required_number_of_approvals}**
 
-    Environment requested: **{next_env}**
+Environment requested: **{next_env}**
 
-    To approve, please comment: `!approved {next_env}`
-    """
+To approve, please comment: `!approved {next_env}`
+"""
 
     resp = post_comment(body)
 
