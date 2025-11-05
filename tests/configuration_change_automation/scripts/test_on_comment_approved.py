@@ -14,9 +14,15 @@ def test_not_authorized(monkeypatch):
     })
     mock_post = MagicMock()
     monkeypatch.setattr(on_comment_approved, 'post_comment', mock_post)
+    mock_add = MagicMock()
+    mock_remove = MagicMock()
+    monkeypatch.setattr(on_comment_approved, 'add_label', mock_add)
+    monkeypatch.setattr(on_comment_approved, 'remove_label', mock_remove)
     with pytest.raises(SystemExit):
         on_comment_approved.main()
     mock_post.assert_called()
+    mock_add.assert_not_called()
+    mock_remove.assert_not_called()
 
 def test_malformed_approval(monkeypatch):
     monkeypatch.setenv('COMMENTER', 'a')
@@ -27,9 +33,15 @@ def test_malformed_approval(monkeypatch):
     })
     mock_post = MagicMock()
     monkeypatch.setattr(on_comment_approved, 'post_comment', mock_post)
+    mock_add = MagicMock()
+    mock_remove = MagicMock()
+    monkeypatch.setattr(on_comment_approved, 'add_label', mock_add)
+    monkeypatch.setattr(on_comment_approved, 'remove_label', mock_remove)
     with pytest.raises(SystemExit):
         on_comment_approved.main()
     mock_post.assert_called()
+    mock_add.assert_not_called()
+    mock_remove.assert_not_called()
 
 def test_not_enough_approvals(monkeypatch):
     monkeypatch.setenv('COMMENTER', 'a')
@@ -41,9 +53,15 @@ def test_not_enough_approvals(monkeypatch):
     monkeypatch.setattr(on_comment_approved, 'get_number_of_approvals', lambda env: 1)
     mock_post = MagicMock()
     monkeypatch.setattr(on_comment_approved, 'post_comment', mock_post)
+    mock_add = MagicMock()
+    mock_remove = MagicMock()
+    monkeypatch.setattr(on_comment_approved, 'add_label', mock_add)
+    monkeypatch.setattr(on_comment_approved, 'remove_label', mock_remove)
     with pytest.raises(SystemExit):
         on_comment_approved.main()
     mock_post.assert_called()
+    mock_add.assert_not_called()
+    mock_remove.assert_not_called()
 
 def test_enough_approvals(monkeypatch):
     monkeypatch.setenv('COMMENTER', 'a')

@@ -19,5 +19,11 @@ def test_on_issue_opened_post_comment(monkeypatch):
 
 def test_on_issue_opened_no_next_env(monkeypatch):
     monkeypatch.setattr(on_issue_opened, 'get_next_env', lambda: None)
+    mock_add = MagicMock()
+    mock_remove = MagicMock()
+    monkeypatch.setattr(on_issue_opened, 'add_label', mock_add)
+    monkeypatch.setattr(on_issue_opened, 'remove_label', mock_remove)
     with pytest.raises(SystemExit):
         on_issue_opened.main()
+    mock_add.assert_not_called()
+    mock_remove.assert_not_called()

@@ -43,3 +43,17 @@ def test_deploy_to_prod(monkeypatch):
     mock_remove.assert_any_call('approved for next environment')
     mock_post.assert_called()
     mock_close.assert_called()
+
+# Add a nonhappy path test to ensure no label changes
+def test_deploy_no_next_env(monkeypatch):
+    monkeypatch.setattr(on_comment_deployed, 'get_next_env', lambda: None)
+    mock_remove = MagicMock()
+    mock_add = MagicMock()
+    mock_post = MagicMock()
+    monkeypatch.setattr(on_comment_deployed, 'remove_label', mock_remove)
+    monkeypatch.setattr(on_comment_deployed, 'add_label', mock_add)
+    monkeypatch.setattr(on_comment_deployed, 'post_comment', mock_post)
+    with pytest.raises(Exception):
+        on_comment_deployed.main()
+    mock_add.assert_not_called()
+    mock_remove.assert_not_called()
