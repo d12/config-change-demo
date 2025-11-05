@@ -3,8 +3,10 @@ environments:
     required_approvals: 1
     deployers:
       - "@d12"
+      - "@nwoodthorpe"
     approvers:
       - "@d12"
+      - "@nwoodthorpe"
 
   prod:
     required_approvals: 2
@@ -12,3 +14,4 @@ environments:
       - "@d12"
     approvers:
       - "@d12"
+      - "@nwoodthorpe"
