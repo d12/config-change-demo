@@ -1,28 +1,34 @@
 import textwrap
 from utilities import get_next_env, post_comment, get_configuration_yml
 
-next_env = get_next_env()
 
-if not next_env:
-    print("No next environment detected; skipping.")
-    exit(0)
+def main():
+    next_env = get_next_env()
 
-config = get_configuration_yml()
+    if not next_env:
+        print("No next environment detected; skipping.")
+        exit(0)
 
-approvers = config["environments"][next_env]["approvers"]
-required_number_of_approvals = config["environments"][next_env]["required_approvals"]
+    config = get_configuration_yml()
 
-approvers_string = "\n".join([f"- {a}" for a in approvers])
+    approvers = config["environments"][next_env]["approvers"]
+    required_number_of_approvals = config["environments"][next_env]["required_approvals"]
 
-body = textwrap.dedent(f"""\
-    This change requires approvals from the following approvers:
-    {approvers_string}
+    approvers_string = "\n".join([f"- {a}" for a in approvers])
 
-    Required number of approvals: **{required_number_of_approvals}**
+    body = textwrap.dedent(f"""\
+        This change requires approvals from the following approvers:
+        {approvers_string}
 
-    Environment requested: **{next_env}**
+        Required number of approvals: **{required_number_of_approvals}**
 
-    To approve, please comment: `!approved {next_env}`
-    """)
+        Environment requested: **{next_env}**
 
-resp = post_comment(body)
+        To approve, please comment: `!approved {next_env}`
+        """)
+
+    resp = post_comment(body)
+
+
+if __name__ == "__main__":
+    main()
